@@ -35,14 +35,10 @@ colsMeanSTD <- grepl(pattern="subject|activity|mean|std", names(fullset))
 trimmedset <- fullset[,colsMeanSTD]
 trimmedset <- trimmedset[,-1]
 
-# Average over each subject for each activity
-for (act in trimmedset$activity) {
-    for (subj in trimmedset$subject) {
-        for (datacol in 3:dim(trimmedset)[2]) {
-            print(act)
-            print(subj)
-            print(mean(trimmedset[,datacol]))
-        }
-        
-    }
-}
+# Create a tidy data set while averaging over each subject for each activity
+library(reshape2)
+meltedset <- melt(data=trimmedset, id.vars=c("activity", "subject"))
+tidyset <- dcast(data=meltedset, activity + subject ~ variable, fun.aggregate=mean)
+
+# Write the tidy data set to a text file.
+write.table(x=tidyset, file="tidyset.txt", sep=",")
